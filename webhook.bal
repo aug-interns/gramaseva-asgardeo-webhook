@@ -20,11 +20,18 @@ service asgardeo:RegistrationService on webhookListener {
   
     remote function onAddUser(asgardeo:AddUserEvent event ) returns error? {
       log:printInfo("--------------------- AddUserEvent (START) ---------------------");
-      string? userId = event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
-      if (!(userId is ())) {
+      string? email = event.eventData?.userName; // UserId should be there if a new user is created, hence the typecast
+      if (!(email is ())) {
+        log:printInfo(email);
+        error|scim:UserResource searchResponse = findUserByEmail(email);
+
+        if searchResponse is error {
+            
+            return error("error occurred while searching the user");
+        }
+
+        string userId = <string>searchResponse.id;
         log:printInfo(userId);
-        scim:UserResource cresponse = check scimClient->getUser("aafda81b-2b8f-4c37-9288-f387417573b6");
-        // log:printInfo(cresponse);
         // log:printInfo(cresponse.toJsonString());
         // scim:UserResource response = check scimClient->getUser(<string>userId);
         // log:printInfo(response.toJsonString());
@@ -37,6 +44,22 @@ service asgardeo:RegistrationService on webhookListener {
     remote function onAcceptUserInvite(asgardeo:GenericEvent event ) returns error? {
       // Not implemented
     }
+}
+
+function findUserByEmail(string email) returns error|scim:UserResource {
+
+    string properUserName = string `DEFAULT/${email}`;
+
+    scim:UserSearch searchData = {filter: string `userName eq ${properUserName}`};
+    scim:UserResponse|scim:ErrorResponse|error searchResponse = check scimClient->searchUser(searchData);
+    
+    if searchResponse is scim:UserResponse {
+        scim:UserResource[] userResources = searchResponse.Resources ?: [];
+
+        return userResources[0];
+    } 
+    
+    return error("error occurred while searching the user");
 }
 
 service /ignore on httpListener {}
