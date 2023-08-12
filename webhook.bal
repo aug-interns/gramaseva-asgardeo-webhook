@@ -24,9 +24,10 @@ service asgardeo:RegistrationService on webhookListener {
       if (!(userId is ())) {
         log:printInfo(userId);
         scim:UserResource cresponse = check scimClient->getUser("aafda81b-2b8f-4c37-9288-f387417573b6");
-        log:printInfo(cresponse.toJsonString());
-        scim:UserResource response = check scimClient->getUser(<string>userId);
-        log:printInfo(response.toJsonString());
+        // log:printInfo(cresponse);
+        // log:printInfo(cresponse.toJsonString());
+        // scim:UserResource response = check scimClient->getUser(<string>userId);
+        // log:printInfo(response.toJsonString());
       }
       log:printInfo("--------------------- AddUserEvent (END) ---------------------");
     }
