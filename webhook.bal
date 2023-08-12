@@ -20,10 +20,10 @@ service asgardeo:RegistrationService on webhookListener {
   
     remote function onAddUser(asgardeo:AddUserEvent event ) returns error? {
       log:printInfo("--------------------- AddUserEvent (START) ---------------------");
-      asgardeo:AddUserData? userData = event.eventData;
-      log:printInfo(userData.toJsonString());
-      // scim:UserResource response = check scimClient->getUser();
-      log:printInfo(event.toJsonString());
+      string userId = <string>event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
+      log:printInfo(userId);
+      scim:UserResource response = check scimClient->getUser(userId);
+      log:printInfo(response.toJsonString());
       log:printInfo("--------------------- AddUserEvent (END) ---------------------");
     }
     remote function onConfirmSelfSignup(asgardeo:GenericEvent event ) returns error? {
