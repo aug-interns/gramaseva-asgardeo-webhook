@@ -20,6 +20,9 @@ service asgardeo:RegistrationService on webhookListener {
   
     remote function onAddUser(asgardeo:AddUserEvent event ) returns error? {
       log:printInfo("--------------------- AddUserEvent (START) ---------------------");
+      asgardeo:AddUserData? userData = event.eventData;
+      log:printInfo(userData.toJsonString());
+      // scim:UserResource response = check scimClient->getUser();
       log:printInfo(event.toJsonString());
       log:printInfo("--------------------- AddUserEvent (END) ---------------------");
     }
