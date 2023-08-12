@@ -8,7 +8,20 @@ scim:ConnectorConfig scim_config = {
     orgName: "zetcco",
     clientId: "WjpXaf9B6PLsaS789iUaNhFfHsMa",
     clientSecret : "fv1p6bojR1IDM8Ry6sFiOILBZmkecGDH5skGDEACkmAa",
-    scope : ["openid"]
+    scope : [
+      "internal_user_mgt_view",
+      "internal_user_mgt_list",
+      "internal_user_mgt_create",
+      "internal_user_mgt_delete",
+      "internal_user_mgt_update",
+      "internal_user_mgt_delete",
+      "internal_group_mgt_view",
+      "internal_group_mgt_list",
+      "internal_group_mgt_create",
+      "internal_group_mgt_delete",
+      "internal_group_mgt_update",
+      "internal_group_mgt_delete"
+    ]
 };
 
 listener http:Listener httpListener = new(8090);
