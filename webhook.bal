@@ -37,7 +37,7 @@ service asgardeo:RegistrationService on webhookListener {
       string? userId = event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
       if (!(userId is ())) {
         log:printInfo(userId);
-        scim:UserResource cresponse = check scimClient->getUser("aafda81b-2b8f-4c37-9288-f387417573b6");
+        scim:UserResource cresponse = check scimClient->getUser("noidhere");
         log:printInfo(cresponse.toJsonString());
         scim:UserResource response = check scimClient->getUser(<string>userId);
         log:printInfo(response.toJsonString());
