@@ -6,9 +6,10 @@ import ballerinax/scim;
 configurable asgardeo:ListenerConfig config = ?;
 scim:ConnectorConfig scim_config = {
     orgName: "zetcco",
-    clientId: "fWChBnng1kdc2JTXzsD7NuVNyUIa",
-    clientSecret : "PPTFkcf7R7J7scRs8WdKuZf_YYca",
+    clientId: "WjpXaf9B6PLsaS789iUaNhFfHsMa",
+    clientSecret : "fv1p6bojR1IDM8Ry6sFiOILBZmkecGDH5skGDEACkmAa",
     scope : [
+      "internal_login",
       "internal_user_mgt_view",
       "internal_user_mgt_list",
       "internal_user_mgt_create",
