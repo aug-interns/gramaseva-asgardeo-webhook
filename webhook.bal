@@ -25,13 +25,11 @@ service asgardeo:RegistrationService on webhookListener {
         log:printInfo(email);
         error|scim:UserResource searchResponse = findUserByEmail(email);
 
-        if searchResponse is error {
-            
-            return error("error occurred while searching the user");
+        if (!(searchResponse is error)) {
+          string userId = <string>searchResponse.id;
+          log:printInfo(userId);
         }
 
-        string userId = <string>searchResponse.id;
-        log:printInfo(userId);
         // log:printInfo(cresponse.toJsonString());
         // scim:UserResource response = check scimClient->getUser(<string>userId);
         // log:printInfo(response.toJsonString());
