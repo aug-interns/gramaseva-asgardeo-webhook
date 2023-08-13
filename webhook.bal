@@ -6,8 +6,8 @@ import ballerinax/scim;
 configurable asgardeo:ListenerConfig config = ?;
 scim:ConnectorConfig scim_config = {
     orgName: "zetcco",
-    clientId: "WjpXaf9B6PLsaS789iUaNhFfHsMa",
-    clientSecret : "fv1p6bojR1IDM8Ry6sFiOILBZmkecGDH5skGDEACkmAa",
+    clientId: "lR3O8bqQBd1A91VCxjExPFSd8Ega",
+    clientSecret : "QIMDQjS26fUtOIlrJbVj6nZqZqKwT9coqITEfiVOCg4a",
     scope : [
       "internal_login",
       "internal_user_mgt_view",
@@ -42,6 +42,8 @@ service asgardeo:RegistrationService on webhookListener {
           log:printError(cresponse.message());
           log:printError(cresponse.toString());
           log:printError(cresponse.toBalString());
+        } else {
+          log:printInfo("Worked!!");
         }
         // log:printInfo(cresponse.toJsonString());
         // scim:UserResource response = check scimClient->getUser(<string>userId);
