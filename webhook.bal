@@ -42,8 +42,21 @@ service asgardeo:RegistrationService on webhookListener {
 
       log:printInfo(string `Group ID: ${groupId}`);
       log:printInfo(string `User ID: ${userId}`);
-      // scim:UserResource response = check scimClient->getUser(userId);
-      // log:printInfo(response.toJsonString());
+
+      scim:GroupPatch patchData = {
+        Operations: [
+          { 
+            op: "add", 
+            value: { members: [ { value: userId } ] }
+          }
+        ]
+      };
+      scim:GroupResponse|scim:ErrorResponse|error patchResponse = scimClient->patchGroup(groupId, patchData);
+      if (patchResponse is error|scim:ErrorResponse) {
+        log:printError(string `Error setting User:${userId} to Group:${groupId}`);
+      } else {
+        log:printInfo(string `User:${userId} assigned to Group:${groupId}`);
+      }
     }
     remote function onConfirmSelfSignup(asgardeo:GenericEvent event ) returns error? {
       // Not implemented
