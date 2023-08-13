@@ -35,23 +35,14 @@ service asgardeo:RegistrationService on webhookListener {
   
     remote function onAddUser(asgardeo:AddUserEvent event ) returns error? {
       string userId = <string>event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
-      // scim:UserResource response = check scimClient->getUser(userId);
-
-      scim:GroupSearch groupSearchQuery = {filter: string `displayName eq ${GROUP_NAME}`};
-      scim:GroupResponse|scim:ErrorResponse|error groupResponse = scimClient->searchGroup(groupSearchQuery);
-      if (groupResponse is scim:GroupResponse) {
-        if (groupResponse.totalResults != 0) {
-          scim:GroupResource[] groups = <scim:GroupResource[]>groupResponse.Resources;
-          log:printInfo(groups[0].toJsonString());
-          log:printInfo(string `Group ID: ${groups[0].id ?: "Not found"}`);
-        } else {
-          log:printError(string`No groups found for ${GROUP_NAME}`);
-        }
-      } else if (groupResponse is scim:ErrorResponse) {
-        log:printError(groupResponse.detail().toJsonString());
-      } else {
-        return groupResponse;
+      string|error groupId = getGroupIdByName(GROUP_NAME);
+      if (groupId is error) {
+        return groupId;
       }
+
+      log:printInfo(string `Group ID: ${groupId}`);
+      log:printInfo(string `User ID: ${userId}`);
+      // scim:UserResource response = check scimClient->getUser(userId);
       // log:printInfo(response.toJsonString());
     }
     remote function onConfirmSelfSignup(asgardeo:GenericEvent event ) returns error? {
@@ -63,3 +54,20 @@ service asgardeo:RegistrationService on webhookListener {
 }
 
 service /ignore on httpListener {}
+
+function getGroupIdByName(string name) returns string|error {
+  scim:GroupSearch groupSearchQuery = {filter: string `displayName eq ${name}`};
+  scim:GroupResponse|scim:ErrorResponse|error groupResponse = scimClient->searchGroup(groupSearchQuery);
+  if (groupResponse is scim:GroupResponse) {
+    if (groupResponse.totalResults != 0) {
+      scim:GroupResource[] groups = <scim:GroupResource[]>groupResponse.Resources;
+      return <string>groups[0].id; // GroupId should be there if a group is found
+    } else {
+      return error(string `No groups found for ${name}`);
+    }
+  } else if (groupResponse is scim:ErrorResponse) {
+    return error(string `SCIM Error: ${groupResponse.detail().toJsonString()}`);
+  } else {
+    return groupResponse;
+  }
+}
