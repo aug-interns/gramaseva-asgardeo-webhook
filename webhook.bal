@@ -41,10 +41,6 @@ service asgardeo:RegistrationService on webhookListener {
         return groupId;
       }
 
-      log:printInfo(string `Group ID: ${groupId}`);
-      log:printInfo(string `User ID: ${userId}`);
-      log:printInfo(string `User Name: ${userName}`);
-
       scim:GroupPatch patchData = {
         schemas: [
           "urn:ietf:params:scim:api:messages:2.0:PatchOp"
@@ -63,7 +59,6 @@ service asgardeo:RegistrationService on webhookListener {
       scim:GroupResponse|scim:ErrorResponse|error patchResponse = scimClient->patchGroup(groupId, patchData);
       if (patchResponse is scim:ErrorResponse) {
         log:printError(patchResponse.toString());
-        log:printError(patchResponse.detail().toJsonString());
         log:printError(string `Error setting User:${userId} to Group:${groupId}`);
       } else {
         log:printInfo(string `User:${userId} assigned to Group:${groupId}`);
