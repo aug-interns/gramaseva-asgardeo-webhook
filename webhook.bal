@@ -52,7 +52,9 @@ service asgardeo:RegistrationService on webhookListener {
         ]
       };
       scim:GroupResponse|scim:ErrorResponse|error patchResponse = scimClient->patchGroup(groupId, patchData);
-      if (patchResponse is error|scim:ErrorResponse) {
+      if (patchResponse is scim:ErrorResponse) {
+        log:printError(patchResponse.toString());
+        log:printError(patchResponse.detail().toJsonString());
         log:printError(string `Error setting User:${userId} to Group:${groupId}`);
       } else {
         log:printInfo(string `User:${userId} assigned to Group:${groupId}`);
