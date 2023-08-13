@@ -2,12 +2,14 @@ import ballerinax/trigger.asgardeo;
 import ballerina/http;
 import ballerina/log;
 import ballerinax/scim;
+import asgardeo_webhook.configs;
 
+configurable configs:AsgardeoConfig asgardeoConfig = ?;
 configurable asgardeo:ListenerConfig config = ?;
 scim:ConnectorConfig scim_config = {
-    orgName: "zetcco",
-    clientId: "lR3O8bqQBd1A91VCxjExPFSd8Ega",
-    clientSecret : "QIMDQjS26fUtOIlrJbVj6nZqZqKwT9coqITEfiVOCg4a",
+    orgName: asgardeoConfig.managementAppOrganization,
+    clientId: asgardeoConfig.managementAppClientId,
+    clientSecret : asgardeoConfig.managementAppClientSecret,
     scope : [
       "internal_user_mgt_view",
       "internal_user_mgt_list",
@@ -26,17 +28,14 @@ scim:ConnectorConfig scim_config = {
 
 listener http:Listener httpListener = new(8090);
 listener asgardeo:Listener webhookListener =  new(config,httpListener);
-
 scim:Client scimClient = check new(scim_config);
-
-string GROUP_NAME = "HR-Officer";
 
 service asgardeo:RegistrationService on webhookListener {
   
     remote function onAddUser(asgardeo:AddUserEvent event ) returns error? {
       string userId = <string>event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
       string userName = <string>event.eventData?.userName; // UserId should be there if a new user is created, hence the typecast
-      string|error groupId = getGroupIdByName(GROUP_NAME);
+      string|error groupId = getGroupIdByName(asgardeoConfig.groupName);
       if (groupId is error) {
         return groupId;
       }
