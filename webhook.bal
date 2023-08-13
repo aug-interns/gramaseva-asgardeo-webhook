@@ -9,7 +9,6 @@ scim:ConnectorConfig scim_config = {
     clientId: "lR3O8bqQBd1A91VCxjExPFSd8Ega",
     clientSecret : "QIMDQjS26fUtOIlrJbVj6nZqZqKwT9coqITEfiVOCg4a",
     scope : [
-      "internal_login",
       "internal_user_mgt_view",
       "internal_user_mgt_list",
       "internal_user_mgt_create",
@@ -37,17 +36,10 @@ service asgardeo:RegistrationService on webhookListener {
       string? userId = event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
       if (!(userId is ())) {
         log:printInfo(userId);
-        scim:UserResource|scim:ErrorResponse cresponse = check scimClient->getUsers();
-        if (cresponse is scim:ErrorResponse) {
-          log:printError(cresponse.message());
-          log:printError(cresponse.toString());
-          log:printError(cresponse.toBalString());
-        } else {
-          log:printInfo("Worked!!");
-        }
-        // log:printInfo(cresponse.toJsonString());
-        // scim:UserResource response = check scimClient->getUser(<string>userId);
-        // log:printInfo(response.toJsonString());
+        scim:UserResource cresponse = check scimClient->getUser("aafda81b-2b8f-4c37-9288-f387417573b6");
+        log:printInfo(cresponse.toJsonString());
+        scim:UserResource response = check scimClient->getUser(<string>userId);
+        log:printInfo(response.toJsonString());
       }
       log:printInfo("--------------------- AddUserEvent (END) ---------------------");
     }
