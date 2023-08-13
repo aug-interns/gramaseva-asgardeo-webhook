@@ -35,6 +35,7 @@ service asgardeo:RegistrationService on webhookListener {
   
     remote function onAddUser(asgardeo:AddUserEvent event ) returns error? {
       string userId = <string>event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
+      string userName = <string>event.eventData?.userName; // UserId should be there if a new user is created, hence the typecast
       string|error groupId = getGroupIdByName(GROUP_NAME);
       if (groupId is error) {
         return groupId;
@@ -42,12 +43,20 @@ service asgardeo:RegistrationService on webhookListener {
 
       log:printInfo(string `Group ID: ${groupId}`);
       log:printInfo(string `User ID: ${userId}`);
+      log:printInfo(string `User Name: ${userName}`);
 
       scim:GroupPatch patchData = {
+        schemas: [
+          "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+        ],
         Operations: [
           { 
             op: "add", 
-            value: { members: [ { value: userId } ] }
+            value: { 
+              members: [ 
+                { value: userId, display: userName } 
+              ] 
+            }
           }
         ]
       };
