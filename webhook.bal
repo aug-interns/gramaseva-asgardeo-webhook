@@ -29,19 +29,30 @@ listener asgardeo:Listener webhookListener =  new(config,httpListener);
 
 scim:Client scimClient = check new(scim_config);
 
+string GROUP_NAME = "HR-Officer";
+
 service asgardeo:RegistrationService on webhookListener {
   
     remote function onAddUser(asgardeo:AddUserEvent event ) returns error? {
-      log:printInfo("--------------------- AddUserEvent (START) ---------------------");
-      string? userId = event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
-      if (!(userId is ())) {
-        log:printInfo(userId);
-        scim:UserResource cresponse = check scimClient->getUser("aafda81b-2b8f-4c37-9288-f387417573b6");
-        log:printInfo(cresponse.toJsonString());
-        scim:UserResource response = check scimClient->getUser(<string>userId);
-        log:printInfo(response.toJsonString());
+      string userId = <string>event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
+      // scim:UserResource response = check scimClient->getUser(userId);
+
+      scim:GroupSearch groupSearchQuery = {filter: string `displayName eq ${GROUP_NAME}`};
+      scim:GroupResponse|scim:ErrorResponse|error groupResponse = scimClient->searchGroup(groupSearchQuery);
+      if (groupResponse is scim:GroupResponse) {
+        if (groupResponse.totalResults != 0) {
+          scim:GroupResource[] groups = <scim:GroupResource[]>groupResponse.Resources;
+          log:printInfo(groups[0].toJsonString());
+          log:printInfo(string `Group ID: ${groups[0].id ?: "Not found"}`);
+        } else {
+          log:printError(string`No groups found for ${GROUP_NAME}`);
+        }
+      } else if (groupResponse is scim:ErrorResponse) {
+        log:printError(groupResponse.detail().toJsonString());
+      } else {
+        return groupResponse;
       }
-      log:printInfo("--------------------- AddUserEvent (END) ---------------------");
+      // log:printInfo(response.toJsonString());
     }
     remote function onConfirmSelfSignup(asgardeo:GenericEvent event ) returns error? {
       // Not implemented
