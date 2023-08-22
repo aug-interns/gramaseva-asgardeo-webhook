@@ -33,6 +33,7 @@ scim:Client scimClient = check new(scim_config);
 service asgardeo:RegistrationService on webhookListener {
   
     remote function onAddUser(asgardeo:AddUserEvent event ) returns error? {
+      log:printInfo("Fired onAddUser");
       string userId = <string>event.eventData?.userId; // UserId should be there if a new user is created, hence the typecast
       string userName = <string>event.eventData?.userName; // UserId should be there if a new user is created, hence the typecast
       string|error groupId = getGroupIdByName(asgardeoConfig.groupName);
@@ -64,10 +65,14 @@ service asgardeo:RegistrationService on webhookListener {
       }
     }
     remote function onConfirmSelfSignup(asgardeo:GenericEvent event ) returns error? {
+      string userId = <string>event.eventData?.userId;
+      log:printInfo(string `Fired onConfirmSelfSignup User:${userId}`);
       // Not implemented
     }
     remote function onAcceptUserInvite(asgardeo:GenericEvent event ) returns error? {
       // Not implemented
+      string userId = <string>event.eventData?.userId;
+      log:printInfo(string `Fired onAcceptUserInvite User:${userId}`);
     }
 }
 
